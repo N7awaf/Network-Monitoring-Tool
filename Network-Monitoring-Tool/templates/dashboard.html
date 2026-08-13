@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Network Monitoring Dashboard
+    </title>
+
+
+    <!-- Chart.js -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #f4f6f8;
+
+            color: #172033;
+        }
+
+
+        .container {
+
+            width: 95%;
+
+            max-width: 1500px;
+
+            margin: 30px auto;
+        }
+
+
+        /* =================================
+           HEADER
+        ================================= */
+
+        .header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 25px;
+        }
+
+
+        .header h1 {
+
+            margin: 0;
+
+            font-size: 32px;
+        }
+
+
+        .header p {
+
+            margin-top: 8px;
+
+            color: #6b7280;
+        }
+
+
+        /* =================================
+           CONTROLS
+        ================================= */
+
+        .controls {
+
+            display: flex;
+
+            gap: 10px;
+
+            align-items: center;
+
+            flex-wrap: wrap;
+        }
+
+
+        button {
+
+            border: none;
+
+            border-radius: 8px;
+
+            padding: 11px 18px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+
+        .refresh-btn {
+
+            background: #2563eb;
+
+            color: white;
+        }
+
+
+        .refresh-btn:hover {
+
+            background: #1d4ed8;
+        }
+
+
+        .auto-btn {
+
+            background: #16a34a;
+
+            color: white;
+        }
+
+
+        .auto-btn.off {
+
+            background: #6b7280;
+        }
+
+
+        /* =================================
+           ALERTS
+        ================================= */
+
+        .alerts {
+
+            margin-bottom: 25px;
+        }
+
+
+        .alert {
+
+            padding: 16px 20px;
+
+            border-radius: 10px;
+
+            margin-bottom: 10px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+        }
+
+
+        .alert-danger {
+
+            background: #fee2e2;
+
+            border: 1px solid #fecaca;
+
+            color: #991b1b;
+        }
+
+
+        .alert-icon {
+
+            font-size: 20px;
+
+            font-weight: bold;
+        }
+
+
+        .no-alert {
+
+            background: #dcfce7;
+
+            border: 1px solid #bbf7d0;
+
+            color: #166534;
+
+            padding: 16px 20px;
+
+            border-radius: 10px;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* =================================
+           STATISTICS
+        ================================= */
+
+        .stats {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 18px;
+
+            margin-bottom: 25px;
+        }
+
+
+        .stat-card {
+
+            background: white;
+
+            padding: 22px;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 4px 15px
+                rgba(0, 0, 0, 0.06);
+        }
+
+
+        .stat-title {
+
+            color: #6b7280;
+
+            font-size: 14px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .stat-value {
+
+            font-size: 28px;
+
+            font-weight: bold;
+        }
+
+
+        .online-value {
+
+            color: #16a34a;
+        }
+
+
+        .offline-value {
+
+            color: #dc2626;
+        }
+
+
+        /* =================================
+           CARDS
+        ================================= */
+
+        .card {
+
+            background: white;
+
+            border-radius: 14px;
+
+            padding: 28px;
+
+            margin-bottom: 25px;
+
+            box-shadow:
+                0 4px 15px
+                rgba(0, 0, 0, 0.06);
+        }
+
+
+        .card-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 20px;
+        }
+
+
+        .card-header h2 {
+
+            margin: 0;
+
+            font-size: 24px;
+        }
+
+
+        /* =================================
+           ADD DEVICE
+        ================================= */
+
+        .add-device {
+
+            display: none;
+
+            margin-top: 15px;
+
+            padding: 18px;
+
+            background: #f8fafc;
+
+            border-radius: 10px;
+        }
+
+
+        .add-device.show {
+
+            display: block;
+        }
+
+
+        .add-form {
+
+            display: flex;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+        }
+
+
+        input {
+
+            padding: 12px 14px;
+
+            border: 1px solid #d1d5db;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            outline: none;
+        }
+
+
+        input:focus {
+
+            border-color: #2563eb;
+        }
+
+
+        .add-submit {
+
+            background: #2563eb;
+
+            color: white;
+        }
+
+
+        .plus-btn {
+
+            width: 38px;
+
+            height: 38px;
+
+            padding: 0;
+
+            border-radius: 50%;
+
+            background: #2563eb;
+
+            color: white;
+
+            font-size: 22px;
+
+            line-height: 38px;
+        }
+
+
+        /* =================================
+           DEVICES TABLE
+        ================================= */
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+        }
+
+
+        th {
+
+            background: #f8fafc;
+
+            color: #64748b;
+
+            text-align: left;
+
+            padding: 15px;
+        }
+
+
+        td {
+
+            padding: 16px 15px;
+
+            border-top: 1px solid #e5e7eb;
+        }
+
+
+        .device-name {
+
+            font-weight: bold;
+        }
+
+
+        .status {
+
+            display: inline-block;
+
+            padding: 6px 12px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+        }
+
+
+        .status-online {
+
+            background: #dcfce7;
+
+            color: #15803d;
+        }
+
+
+        .status-offline {
+
+            background: #fee2e2;
+
+            color: #dc2626;
+        }
+
+
+        .delete-btn {
+
+            background: #fee2e2;
+
+            color: #dc2626;
+
+            padding: 8px 13px;
+        }
+
+
+        .delete-btn:hover {
+
+            background: #fecaca;
+        }
+
+
+        /* =================================
+           CHART
+        ================================= */
+
+        .chart-wrapper {
+
+            position: relative;
+
+            height: 420px;
+
+            width: 100%;
+        }
+
+
+        /* =================================
+           HISTORY
+        ================================= */
+
+        .history-wrapper {
+
+            max-height: 300px;
+
+            overflow-y: auto;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 8px;
+        }
+
+
+        .history-wrapper table {
+
+            margin: 0;
+        }
+
+
+        .history-wrapper th {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 2;
+        }
+
+
+        /* =================================
+           RESPONSIVE
+        ================================= */
+
+        @media (max-width: 900px) {
+
+            .stats {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 15px;
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .stats {
+
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+
+                padding: 18px;
+            }
+
+            table {
+
+                font-size: 13px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- =================================
+         HEADER
+    ================================= -->
+
+    <div class="header">
+
+        <div>
+
+            <h1>
+                Network Monitoring Dashboard
+            </h1>
+
+            <p>
+                Monitor network devices,
+                latency and availability.
+            </p>
+
+        </div>
+
+
+        <div class="controls">
+
+            <button
+                class="refresh-btn"
+                onclick="refreshNow()"
+            >
+                ↻ Refresh Now
+            </button>
+
+
+            <button
+                id="autoButton"
+                class="auto-btn"
+                onclick="toggleAutoRefresh()"
+            >
+                Auto Refresh: ON
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================
+         ALERTS
+    ================================= -->
+
+    <div class="alerts">
+
+        {% if alerts %}
+
+            {% for alert in alerts %}
+
+                <div class="alert alert-danger">
+
+                    <span class="alert-icon">
+                        ⚠
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            {{ alert.title }}
+                        </strong>
+
+                        <br>
+
+                        {{ alert.message }}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="no-alert">
+
+                ✓ All monitored devices are currently
+                online.
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- =================================
+         STATISTICS
+    ================================= -->
+
+    <div class="stats">
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                Total Devices
+            </div>
+
+            <div class="stat-value">
+                {{ statistics.total }}
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                Online
+            </div>
+
+            <div class="stat-value online-value">
+                {{ statistics.online }}
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                Offline
+            </div>
+
+            <div class="stat-value offline-value">
+                {{ statistics.offline }}
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                Average Latency
+            </div>
+
+            <div class="stat-value">
+
+                {{ statistics.average_latency }} ms
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =================================
+         DEVICES
+    ================================= -->
+
+    <div class="card">
+
+
+        <div class="card-header">
+
+            <h2>
+                Devices
+            </h2>
+
+
+            <button
+                class="plus-btn"
+                onclick="toggleAddDevice()"
+                title="Add Device"
+            >
+                +
+            </button>
+
+        </div>
+
+
+        <!-- ADD DEVICE -->
+
+        <div
+            id="addDeviceBox"
+            class="add-device"
+        >
+
+            <form
+                class="add-form"
+                method="POST"
+                action="/add-device"
+            >
+
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="Device Name"
+                    required
+                >
+
+
+                <input
+                    type="text"
+                    name="ip"
+                    placeholder="IP Address"
+                    required
+                >
+
+
+                <button
+                    type="submit"
+                    class="add-submit"
+                >
+                    + Add Device
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <br>
+
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Device
+                    </th>
+
+                    <th>
+                        IP Address
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Latency
+                    </th>
+
+                    <th>
+                        Availability
+                    </th>
+
+                    <th>
+                        Avg Latency
+                    </th>
+
+                    <th>
+                        Actions
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for device in devices %}
+
+                    <tr>
+
+                        <td class="device-name">
+
+                            {{ device.name }}
+
+                        </td>
+
+
+                        <td>
+
+                            {{ device.ip }}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if device.status == "ONLINE" %}
+
+                                <span
+                                    class="status status-online"
+                                >
+                                    ONLINE
+                                </span>
+
+                            {% else %}
+
+                                <span
+                                    class="status status-offline"
+                                >
+                                    OFFLINE
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if device.latency is not none %}
+
+                                {{ device.latency }} ms
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {{ device_statistics[device.name].availability }}%
+
+                        </td>
+
+
+                        <td>
+
+                            {% if device_statistics[device.name].average_latency is not none %}
+
+                                {{ device_statistics[device.name].average_latency }} ms
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            <form
+                                method="POST"
+                                action="/delete-device/{{ device.ip }}"
+                                onsubmit="return confirm('Delete this device?');"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="delete-btn"
+                                >
+                                    Delete
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- =================================
+         LATENCY CHART
+    ================================= -->
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <h2>
+                Latency History
+            </h2>
+
+        </div>
+
+
+        <div class="chart-wrapper">
+
+            <canvas id="latencyChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================
+         RECENT HISTORY
+    ================================= -->
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <h2>
+                Recent Checks
+            </h2>
+
+        </div>
+
+
+        <div class="history-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Time
+                        </th>
+
+                        <th>
+                            Device
+                        </th>
+
+                        <th>
+                            IP
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Latency
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for record in recent_history %}
+
+                        <tr>
+
+                            <td>
+                                {{ record.timestamp }}
+                            </td>
+
+                            <td>
+                                {{ record.name }}
+                            </td>
+
+                            <td>
+                                {{ record.ip }}
+                            </td>
+
+                            <td>
+
+                                {% if record.status == "ONLINE" %}
+
+                                    <span
+                                        class="status status-online"
+                                    >
+                                        ONLINE
+                                    </span>
+
+                                {% else %}
+
+                                    <span
+                                        class="status status-offline"
+                                    >
+                                        OFFLINE
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if record.latency is not none %}
+
+                                    {{ record.latency }} ms
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================
+         LAST CHECK
+    ================================= -->
+
+    <div
+        style="
+        text-align:center;
+        color:#64748b;
+        margin-bottom:30px;
+        "
+    >
+
+        Last check:
+        {{ statistics.last_check }}
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+    // ==========================================
+    // AUTO REFRESH
+    // ==========================================
+
+    let autoRefresh = true;
+
+    let refreshTimer = null;
+
+
+    function startAutoRefresh() {
+
+        if (refreshTimer) {
+
+            clearInterval(refreshTimer);
+
+        }
+
+
+        refreshTimer = setInterval(
+
+            function () {
+
+                if (autoRefresh) {
+
+                    window.location.reload();
+
+                }
+
+            },
+
+            10000
+
+        );
+
+    }
+
+
+    function toggleAutoRefresh() {
+
+        autoRefresh = !autoRefresh;
+
+        const button =
+            document.getElementById(
+                "autoButton"
+            );
+
+
+        if (autoRefresh) {
+
+            button.innerText =
+                "Auto Refresh: ON";
+
+            button.classList.remove(
+                "off"
+            );
+
+            startAutoRefresh();
+
+        } else {
+
+            button.innerText =
+                "Auto Refresh: OFF";
+
+            button.classList.add(
+                "off"
+            );
+
+            clearInterval(
+                refreshTimer
+            );
+
+        }
+
+    }
+
+
+    function refreshNow() {
+
+        window.location.reload();
+
+    }
+
+
+    startAutoRefresh();
+
+
+    // ==========================================
+    // ADD DEVICE
+    // ==========================================
+
+    function toggleAddDevice() {
+
+        const box =
+            document.getElementById(
+                "addDeviceBox"
+            );
+
+        box.classList.toggle(
+            "show"
+        );
+
+    }
+
+
+    // ==========================================
+    // LATENCY CHART
+    // ==========================================
+
+    const chartData =
+        {{ chart_data | tojson }};
+
+
+    const datasets = [];
+
+
+    const deviceNames =
+        Object.keys(chartData);
+
+
+    deviceNames.forEach(
+
+        function(name) {
+
+            const data =
+                chartData[name];
+
+
+            datasets.push({
+
+                label: name,
+
+                data: data.latencies,
+
+                borderWidth: 3,
+
+                tension: 0.3,
+
+                pointRadius: 3,
+
+                fill: false
+
+            });
+
+        }
+
+    );
+
+
+    let labels = [];
+
+
+    if (deviceNames.length > 0) {
+
+        labels =
+            chartData[
+                deviceNames[0]
+            ].labels;
+
+    }
+
+
+    new Chart(
+
+        document.getElementById(
+            "latencyChart"
+        ),
+
+        {
+
+            type: "line",
+
+            data: {
+
+                labels: labels,
+
+                datasets: datasets
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+
+                interaction: {
+
+                    mode: "index",
+
+                    intersect: false
+
+                },
+
+
+                plugins: {
+
+                    legend: {
+
+                        position: "top"
+
+                    }
+
+                },
+
+
+                scales: {
+
+                    x: {
+
+                        title: {
+
+                            display: true,
+
+                            text: "Time"
+
+                        },
+
+                        ticks: {
+
+                            maxTicksLimit: 8
+
+                        }
+
+                    },
+
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        title: {
+
+                            display: true,
+
+                            text: "Latency (ms)"
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+</script>
+
+
+</body>
+
+</html>
