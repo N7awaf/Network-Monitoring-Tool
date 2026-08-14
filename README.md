@@ -545,11 +545,10 @@ The application follows a lightweight monitoring architecture that connects the 
 flowchart TD
     U["User"] --> D["Web Dashboard<br/>HTML / CSS / JavaScript"]
 
-    D --> F["Flask Application<br/>app.py"]
+    D --> F["Flask Backend<br/>app.py"]
 
-    F --> C["Device Configuration<br/>config/devices.txt"]
-
-    F --> M["Monitoring Engine<br/>Ping Devices"]
+    F --> C["Device Configuration<br/>devices.txt"]
+    F --> M["Monitoring Engine<br/>Ping Checks"]
 
     M --> P["Online / Offline Detection"]
     M --> L["Latency Measurement"]
@@ -557,7 +556,7 @@ flowchart TD
     P --> H["Monitoring History"]
     L --> H
 
-    H --> LF["logs/network_history.log"]
+    H --> LF["network_history.log"]
 
     H --> S["Statistics"]
     S --> A["Availability"]
@@ -572,24 +571,28 @@ flowchart TD
     D --> AR["Auto Refresh"]
     D --> AD["Add / Remove Devices"]
     D --> X["Offline Alerts"]
+```
+
+The architecture is intentionally lightweight and focuses on demonstrating the connection between networking, backend development, monitoring, logging, and web visualization.
+
 ---
 
-# 🔐 Security Considerations
+## 🔐 Security Considerations
 
 This project is designed as a local monitoring application and is not currently intended to be deployed directly as a production monitoring service.
 
 Before deploying it in a real environment, additional security considerations would be required, including:
 
-* Authentication
-* Authorization
-* Input validation
-* CSRF protection
-* Secure configuration management
-* Access control
-* Production WSGI server
-* Secure logging
-* Rate limiting
-* Better network error handling
+- Authentication
+- Authorization
+- Input validation
+- CSRF protection
+- Secure configuration management
+- Access control
+- Production WSGI server
+- Secure logging
+- Rate limiting
+- Better network error handling
 
 The current application is primarily intended for learning, experimentation, and portfolio demonstration.
 
