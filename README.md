@@ -542,28 +542,19 @@ This changed the application from a simple monitoring script into a more interac
 The current project follows a lightweight architecture:
 
 ```text
-                ┌──────────────────────┐
-                │      Dashboard       │
-                │      HTML/CSS/JS     │
-                └──────────┬───────────┘
-                           │
-                           ▼
-                ┌──────────────────────┐
-                │       Flask          │
-                │      app.py          │
-                └──────────┬───────────┘
-                           │
-             ┌─────────────┼─────────────┐
-             ▼             ▼             ▼
-        Device Config   Monitoring     History
-          devices.txt   Ping Checks     Log File
-             │             │             │
-             └─────────────┼─────────────┘
-                           ▼
-                     Statistics
-                           │
-                           ▼
-                      Dashboard
+flowchart TD
+    A["Dashboard<br/>HTML / CSS / JavaScript"] --> B["Flask Backend<br/>app.py"]
+
+    B --> C["Device Configuration<br/>config/devices.txt"]
+    B --> D["Monitoring Engine<br/>Ping Checks"]
+    B --> E["History Storage<br/>logs/network_history.log"]
+
+    C --> D
+    D --> E
+    E --> F["Statistics & Analytics"]
+
+    F --> A
+    D --> A
 ```
 
 The architecture is intentionally simple and suitable for a personal learning project.
