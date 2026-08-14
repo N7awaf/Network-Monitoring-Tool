@@ -537,28 +537,41 @@ This changed the application from a simple monitoring script into a more interac
 
 ---
 
-# 🏗️ Architecture
+## 🏗️ Architecture
 
-The current project follows a lightweight architecture:
+The application follows a lightweight monitoring architecture that connects the web dashboard, Flask backend, monitoring engine, configuration, historical logging, and statistics.
 
-```text
+```mermaid
 flowchart TD
-    A["Dashboard<br/>HTML / CSS / JavaScript"] --> B["Flask Backend<br/>app.py"]
+    U["User"] --> D["Web Dashboard<br/>HTML / CSS / JavaScript"]
 
-    B --> C["Device Configuration<br/>config/devices.txt"]
-    B --> D["Monitoring Engine<br/>Ping Checks"]
-    B --> E["History Storage<br/>logs/network_history.log"]
+    D --> F["Flask Application<br/>app.py"]
 
-    C --> D
-    D --> E
-    E --> F["Statistics & Analytics"]
+    F --> C["Device Configuration<br/>config/devices.txt"]
 
-    F --> A
-    D --> A
-```
+    F --> M["Monitoring Engine<br/>Ping Devices"]
 
-The architecture is intentionally simple and suitable for a personal learning project.
+    M --> P["Online / Offline Detection"]
+    M --> L["Latency Measurement"]
 
+    P --> H["Monitoring History"]
+    L --> H
+
+    H --> LF["logs/network_history.log"]
+
+    H --> S["Statistics"]
+    S --> A["Availability"]
+    S --> AL["Average Latency"]
+
+    A --> D
+    AL --> D
+    P --> D
+    L --> D
+
+    D --> R["Manual Refresh"]
+    D --> AR["Auto Refresh"]
+    D --> AD["Add / Remove Devices"]
+    D --> X["Offline Alerts"]
 ---
 
 # 🔐 Security Considerations
